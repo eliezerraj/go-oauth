@@ -137,7 +137,9 @@ func main (){
 	workerService, err := service.NewWorkerService(	coreSecretManager, 
 													coreDynamoDB, 
 													appServer.AwsService, 
-													appServer.RsaKey)
+													appServer.RsaKey,
+													service.TokenValidationRSA,
+													service.CreatedTokenRSA)
 	if err != nil {
 		panic("error create a workerservice " + err.Error())
 	}

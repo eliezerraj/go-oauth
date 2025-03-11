@@ -25,6 +25,21 @@ type HttpRouters struct {
 	workerService 	*service.WorkerService
 }
 
+// Above setup the type model of jwt key signature
+func (h *HttpRouters) setSignModel(model string, credential *model.Credential){
+	if model == "HS256" {
+		credential.JwtKeySign = h.workerService.Keys.JwtKey
+		credential.JwtKeyCreation = h.workerService.Keys.JwtKey
+		h.workerService.TokenSignedValidation = service.TokenValidationHS256
+		h.workerService.CreatedToken = service.CreatedTokenHS256
+	} else {
+		credential.JwtKeySign = h.workerService.Keys.Key_rsa_pub
+		credential.JwtKeyCreation = h.workerService.Keys.Key_rsa_priv
+		h.workerService.TokenSignedValidation = service.TokenValidationRSA
+		h.workerService.CreatedToken = service.CreatedTokenRSA
+	}
+}
+
 func NewHttpRouters(workerService *service.WorkerService) HttpRouters {
 	return HttpRouters{
 		workerService: workerService,
@@ -74,9 +89,9 @@ func (h *HttpRouters) OAUTHCredential(rw http.ResponseWriter, req *http.Request)
 
 	// Check which type of authentication method 
 	if req.RequestURI == "/oauth_credential_hs256" {
-			credential.AuthMethod = "HS256"
+		h.setSignModel("HS256", &credential)
 	} else {
-		credential.AuthMethod = "RSA"
+		h.setSignModel("RSA", &credential)
 	}
 
 	//call service
@@ -110,13 +125,11 @@ func (h *HttpRouters) TokenValidation(rw http.ResponseWriter, req *http.Request)
 	credential := model.Credential{}
 	credential.Token = varID
 
-	// Check which type of authentication method 
-
-	
+	// Check which type of authentication method and insert the rigth function
 	if strings.Contains(req.RequestURI, "/tokenValidation_hs256/") {
-		credential.AuthMethod = "HS256"
+		h.setSignModel("HS256", &credential)
 	} else {
-		credential.AuthMethod = "RSA"
+		h.setSignModel("RSA", &credential)
 	}
 
 	//call service
@@ -154,11 +167,11 @@ func (h *HttpRouters) RefreshToken(rw http.ResponseWriter, req *http.Request) er
     }
 	defer req.Body.Close()
 
-	// Check which type of authentication method 
-	if req.RequestURI == "/refresh_token_hs256" {
-			credential.AuthMethod = "HS256"
+	// Check which type of authentication method and insert the rigth function
+	if strings.Contains(req.RequestURI, "/refresh_token_hs256") {
+		h.setSignModel("HS256", &credential)
 	} else {
-		credential.AuthMethod = "RSA"
+		h.setSignModel("RSA", &credential)
 	}
 
 	//call service

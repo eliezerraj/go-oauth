@@ -49,7 +49,8 @@ type Credential struct {
 	User			string	`json:"user,omitempty"`
 	Password		string	`json:"password,omitempty"`
 	Token			string 	`json:"token,omitempty"`
-	AuthMethod		string	`json:"auth_method,omitempty"`
+	JwtKeySign			interface{}
+	JwtKeyCreation		interface{}
 }
 
 type CredentialScope struct {

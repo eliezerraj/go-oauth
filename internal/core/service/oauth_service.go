@@ -5,7 +5,6 @@ import (
 	"time"
 	"context"
 	"encoding/base64"
-	"crypto/rsa"
     "encoding/pem"
 	"crypto/x509"
 
@@ -24,35 +23,63 @@ import (
 var tracerProvider go_core_observ.TracerProvider
 var coreCert go_core_cert.CertCore
 
+type MessageService struct {
+	ValidStatus		bool  	`json:"valid"`
+	Msg				string	`json:"msg"`
+}
+
 // About check token HS256 expired/signature and claims
-func tokenSignedHS256(bearerToken string, hs256Key string) (bool, *model.JwtData, error){
-	childLogger.Debug().Msg("tokenSignedHS256")
+func TokenValidationHS256(bearerToken string, hs256Key interface{}) ( *model.JwtData, error){
+	childLogger.Debug().Msg("TokenValidationHS256")
 
 	claims := &model.JwtData{}
 	tkn, err := jwt.ParseWithClaims(bearerToken, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(hs256Key), nil
+		return []byte(fmt.Sprint(hs256Key)), nil
 	})
 
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
-			return false, nil, erro.ErrStatusUnauthorized
+			return nil, erro.ErrStatusUnauthorized
 		}
-		return false, nil, erro.ErrTokenExpired
+		return nil, erro.ErrTokenExpired
 	}
 
 	if !tkn.Valid {
-		return false, nil, erro.ErrStatusUnauthorized
+		return nil, erro.ErrStatusUnauthorized
 	}
 
-	return true, claims, nil
+	return claims, nil
+}
+
+// About check token RSA expired/signature and claims
+func TokenValidationRSA(bearerToken string, rsaPubKey interface{})( *model.JwtData, error){
+	childLogger.Debug().Msg("TokenValidationRSA")
+
+	claims := &model.JwtData{}
+	tkn, err := jwt.ParseWithClaims(bearerToken, claims, func(token *jwt.Token) (interface{}, error) {
+		return rsaPubKey, nil
+	})
+
+	if err != nil {
+		if err == jwt.ErrSignatureInvalid {
+			return nil, erro.ErrStatusUnauthorized
+		}
+		return nil, erro.ErrTokenExpired
+	}
+
+	if !tkn.Valid {
+		return nil, erro.ErrStatusUnauthorized
+	}
+
+	return claims, nil
 }
 
 // About create token HS256
-func createdTokenHS256(Hs256Key string, expirationTime time.Time, jwtData model.JwtData) (*model.Authentication, error){
-	childLogger.Debug().Msg("createdTokenHS256")
+func CreatedTokenHS256(Hs256Key interface{}, expirationTime time.Time, jwtData model.JwtData) (*model.Authentication, error){
+	childLogger.Debug().Msg("CreatedTokenHS256")
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwtData)
-	tokenString, err := token.SignedString([]byte(Hs256Key))
+	tokenString, err := token.SignedString([]byte(fmt.Sprint(Hs256Key)))
 	if err != nil {
 		return nil, err
 	}
@@ -63,35 +90,12 @@ func createdTokenHS256(Hs256Key string, expirationTime time.Time, jwtData model.
 	return &authentication ,nil
 }
 
-// About check token RSA expired/signature and claims
-func tokenSignedRSA(bearerToken string, rsaPubKey *rsa.PublicKey) (bool, *model.JwtData, error){
-	childLogger.Debug().Msg("tokenSignedRSA")
-
-	claims := &model.JwtData{}
-	tkn, err := jwt.ParseWithClaims(bearerToken, claims, func(token *jwt.Token) (interface{}, error) {
-		return rsaPubKey, nil
-	})
-
-	if err != nil {
-		if err == jwt.ErrSignatureInvalid {
-			return false, nil, erro.ErrStatusUnauthorized
-		}
-		return false, nil, erro.ErrTokenExpired
-	}
-
-	if !tkn.Valid {
-		return false, nil, erro.ErrStatusUnauthorized
-	}
-
-	return true, claims, nil
-}
-
 // About create token RSA
-func createdTokenRSA(key model.RsaKey, expirationTime time.Time, jwtData model.JwtData) (*model.Authentication, error){
-	childLogger.Debug().Msg("createdTokenRSA")
+func CreatedTokenRSA(keyRsaPriv interface{}, expirationTime time.Time, jwtData model.JwtData) (*model.Authentication, error){
+	childLogger.Debug().Msg("CreatedTokenRSA")
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwtData)
-	tokenString, err := token.SignedString(key.Key_rsa_priv)
+	tokenString, err := token.SignedString(keyRsaPriv)
 	if err != nil {
 		return nil, err
 	}
@@ -161,13 +165,8 @@ func (w *WorkerService) OAUTHCredential(ctx context.Context, credential model.Cr
 								},
 	}
 
-	// Create token
-	authentication := &model.Authentication{}	
-	if credential.AuthMethod == "HS256" {
-		authentication, err = createdTokenHS256(w.keys.JwtKey, expirationTime, *jwtData)
-	} else {
-		authentication, err = createdTokenRSA(*w.keys, expirationTime, *jwtData)
-	}
+	// Create token Function via parameter (see router decision)
+	authentication, err := w.CreatedToken(credential.JwtKeyCreation, expirationTime, *jwtData)
 	if err != nil {
 		return nil, err
 	}
@@ -176,27 +175,21 @@ func (w *WorkerService) OAUTHCredential(ctx context.Context, credential model.Cr
 }
 
 // About check a token expitation date
-func (w *WorkerService) TokenValidation(ctx context.Context, credential model.Credential) (bool, error){
+func (w *WorkerService) TokenValidation(ctx context.Context, credential model.Credential) (MessageService, error){
 	childLogger.Debug().Msg("TokenValidation")
 	childLogger.Debug().Interface("credential: ", credential).Msg("")
 
 	// Trace
 	span := tracerProvider.Span(ctx, "service.TokenValidation")
 	span.End()
-
-	// Validate token
-	var res_bool bool
-	var err error
-	if credential.AuthMethod == "HS256" {
-		res_bool, _ ,err = tokenSignedHS256(credential.Token, w.keys.JwtKey)
-	} else {
-		res_bool, _ ,err = tokenSignedRSA(credential.Token, w.keys.Key_rsa_pub)
-	}
+	
+	// Validate token - Function via parameter (see router decision)
+	_, err := w.TokenSignedValidation(credential.Token, credential.JwtKeySign)
 	if err != nil {
-		return false, err
+		return MessageService{ValidStatus: false, Msg: err.Error()}, err
 	}
 
-	return res_bool, nil
+	return MessageService{ValidStatus: true, Msg: "success"}, nil
 }
 
 // About refresh token
@@ -210,29 +203,19 @@ func (w *WorkerService) RefreshToken(ctx context.Context, credential model.Crede
 
 	// Validate token and extract claims
 	jwtData := &model.JwtData{}
-	var err error
 
-	if credential.AuthMethod == "HS256" {
-		_, jwtData ,err = tokenSignedHS256(credential.Token, w.keys.JwtKey)
-	} else {
-		_, jwtData ,err = tokenSignedRSA(credential.Token, w.keys.Key_rsa_pub)
-	}
+	// Validate token
+	jwtData, err := w.TokenSignedValidation(credential.Token, credential.JwtKeySign)
 	if err != nil {
 		return nil, err
 	}
-
 	// Set a new tokens claims
 	expirationTime := time.Now().Add(60 * time.Minute)
 	jwtData.ExpiresAt = jwt.NewNumericDate(expirationTime)
 	jwtData.ISS = "go-oauth-refreshed"
 
-	// Recreate token
-	authentication := &model.Authentication{}	
-	if credential.AuthMethod == "HS256" {
-		authentication, err = createdTokenHS256(w.keys.JwtKey, expirationTime, *jwtData)
-	} else {
-		authentication, err = createdTokenRSA(*w.keys, expirationTime, *jwtData)
-	}
+	// Create token Function via parameter (see router decision)
+	authentication, err := w.CreatedToken(credential.JwtKeyCreation, expirationTime, *jwtData)
 	if err != nil {
 		return nil, err
 	}
@@ -249,7 +232,7 @@ func (w *WorkerService) WellKnown(ctx context.Context) (*model.Jwks, error){
 	span.End()
 
 	// Convert B64 pub key
-	nBase64 := base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString([]byte(w.keys.Key_rsa_pub_pem))
+	nBase64 := base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString([]byte(w.Keys.Key_rsa_pub_pem))
 
 	// prepate jkws
 	jKey := model.JKey{
@@ -269,7 +252,7 @@ func (w *WorkerService) WellKnown(ctx context.Context) (*model.Jwks, error){
 }
 
 // About valid token was signed with pub key
-func (w *WorkerService) ValidationTokenSignedPubKey(ctx context.Context, jwksData model.JwksData) (bool, error){
+func (w *WorkerService) ValidationTokenSignedPubKey(ctx context.Context, jwksData model.JwksData) (MessageService, error){
 	childLogger.Debug().Msg("ValidationTokenSignedPubKey")
 
 	// Trace
@@ -279,22 +262,22 @@ func (w *WorkerService) ValidationTokenSignedPubKey(ctx context.Context, jwksDat
 	// Decode b64 pubkey to pem pubkey
 	rsa_pub_key_pem, err := base64.RawStdEncoding.DecodeString(jwksData.RSAPublicKeyB64)
 	if err != nil {
-		return false, err
+		return MessageService{ValidStatus: false, Msg: err.Error()}, err
 	}	
 	str_rsa_pub_key_pem := string(rsa_pub_key_pem)
 	// Validate pem pubkey 
 	rsa_pub_key, err := coreCert.ParsePemToRSAPub(&str_rsa_pub_key_pem)
 	if err != nil {
-		return false, err
+		return MessageService{ValidStatus: false, Msg: err.Error()}, err
 	}
 
 	// Check with token is signed 
-	res_bool, _ ,err := tokenSignedRSA(jwksData.Token, rsa_pub_key)
+	_ , err = TokenValidationRSA(jwksData.Token, rsa_pub_key)
 	if err != nil {
-		return false, err
+		return MessageService{ValidStatus: false, Msg: err.Error()}, err
 	}
 	
-	return res_bool, nil
+	return MessageService{ValidStatus: true, Msg: "success"}, nil
 }
 
 // About valid a crl list
@@ -327,7 +310,7 @@ func (w *WorkerService) VerifyCertCRL(ctx context.Context, certX509PemEncoded st
 	certSerialNumber := certX509.SerialNumber
 	childLogger.Debug().Interface("certSerialNumber : ", certSerialNumber).Msg("")
 
-	block, _ := pem.Decode([]byte(w.keys.Crl_pem))
+	block, _ := pem.Decode([]byte(w.Keys.Crl_pem))
 	if block == nil || block.Type != "X509 CRL" {
 		return false, err
 	}

@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: &app-name go-oauth-cm
+  namespace: test-a
+  labels:
+    app: *app-name
+data:
+  API_VERSION: "2.0"
+  POD_NAME: "go-oauth.k8"
+  PORT: "5100"
+  SETPOD_AZ: "false"
+  ENV: "dev"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "arch-eks-02-xray-collector.default.svc.cluster.local:4317"
+
+  DYNAMO_TABLE_NAME: "user_login_2"
+  SECRET_NAME: "key-jwt-auth"
+  
+ 

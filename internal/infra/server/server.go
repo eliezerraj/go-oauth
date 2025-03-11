@@ -15,7 +15,6 @@ import (
 	go_core_observ "github.com/eliezerraj/go-core/observability"  
 	"github.com/eliezerraj/go-core/middleware"
 
-
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
 
@@ -128,6 +127,18 @@ func (h HttpServer) StartHttpAppServer(	ctx context.Context,
 	verifyCertCRL := myRouter.Methods(http.MethodPost, http.MethodOptions).Subrouter()
 	verifyCertCRL.Handle("/verifyCertCRL",core_middleware.MiddleWareErrorHandler(httpRouters.VerifyCertCRL),)
 	verifyCertCRL.Use(otelmux.Middleware("go-oauth"))	
+
+	signIn := myRouter.Methods(http.MethodPost, http.MethodOptions).Subrouter()
+	signIn.Handle("/signIn",core_middleware.MiddleWareErrorHandler(httpRouters.SignIn),)
+	signIn.Use(otelmux.Middleware("go-oauth"))	
+
+	addScope := myRouter.Methods(http.MethodPost, http.MethodOptions).Subrouter()
+	addScope.Handle("/add/acope",core_middleware.MiddleWareErrorHandler(httpRouters.AddScope),)
+	addScope.Use(otelmux.Middleware("go-oauth"))	
+
+	getCredential := myRouter.Methods(http.MethodGet, http.MethodOptions).Subrouter()
+	getCredential.Handle("/credential/{id}",core_middleware.MiddleWareErrorHandler(httpRouters.GetCredential),)
+	getCredential.Use(otelmux.Middleware("go-oauth"))
 
 	// setup http server
 	srv := http.Server{

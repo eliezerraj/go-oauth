@@ -112,7 +112,7 @@ func (w *WorkerService) OAUTHCredential(ctx context.Context, credential model.Cr
 	childLogger.Debug().Interface("credential: ", credential).Msg("")
 
 	// Trace
-	span := tracerProvider.Span(ctx, "service.AddAccount")
+	span := tracerProvider.Span(ctx, "service.OAUTHCredential")
 	span.End()
 
 	// Prepare ID and SK

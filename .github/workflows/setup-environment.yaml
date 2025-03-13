@@ -9,7 +9,7 @@ on:
       REGION:
         required: true
         type: string
-        
+
     outputs:
       AWS_ACCOUNT_ID:
         description: 'AWS Account ID'
@@ -38,6 +38,9 @@ on:
       CLUSTER_NAMESPACE:
         description: 'Cluster namespace'
         value: ${{ jobs.set-workflow-variables.outputs.CLUSTER_NAMESPACE }}
+      IMAGE_TAG:
+        description: 'Image tag'
+        value: ${{ jobs.set-workflow-variables.outputs.IMAGE_TAG }}
 
 jobs:
   set-workflow-variables:
@@ -50,6 +53,7 @@ jobs:
       ENVIRONMENT: ${{ steps.set_variables.outputs.ENVIRONMENT }}
       CLUSTER_NAME: ${{ steps.set_variables.outputs.CLUSTER_NAME }}
       CLUSTER_NAMESPACE: ${{ steps.set_variables.outputs.CLUSTER_NAMESPACE }}
+      IMAGE_TAG: ${{ steps.image_tag.outputs.IMAGE_TAG }}
 
     steps:
       - id: repo_name
@@ -58,6 +62,8 @@ jobs:
         run: echo "MAIN_GO_FILE=cmd/main.go" >> "$GITHUB_OUTPUT"
       - id: cloudformation_template_path
         run: echo "CLOUDFORMATION_TEMPLATE_PATH=assets/cloudformation/template/oidc-cloudformation.yaml" >> "$GITHUB_OUTPUT"
+      - id: image_tag
+        run: echo "IMAGE_TAG=latest" >> "$GITHUB_OUTPUT"
       - id: set_variables # Define env var
         run: |
           case "${{ github.ref }}" in

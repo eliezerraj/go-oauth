@@ -46,6 +46,8 @@ jobs:
   set-workflow-variables:
     runs-on: ubuntu-latest
     outputs:
+      AWS_ACCOUNT_ID: ${{ steps.set_variables.outputs.AWS_ACCOUNT_ID }}
+      AWS_REGION: ${{ steps.set_variables.outputs.AWS_REGION }}
       REPO_NAME: ${{ steps.repo_name.outputs.REPO_NAME }}
       MAIN_GO_FILE: ${{ steps.main_go_file.outputs.MAIN_GO_FILE }}
       CLOUDFORMATION_TEMPLATE_PATH: ${{ steps.cloudformation_template_path.outputs.CLOUDFORMATION_TEMPLATE_PATH }}

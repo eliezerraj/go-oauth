@@ -6,7 +6,10 @@ on:
       AWS_ACCOUNT_ID:
         required: true
         type: string
-
+      REGION:
+        required: true
+        type: string
+        
     outputs:
       AWS_ACCOUNT_ID:
         description: 'AWS Account ID'

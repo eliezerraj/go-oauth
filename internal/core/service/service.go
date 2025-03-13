@@ -6,13 +6,11 @@ import(
 
 	"github.com/go-oauth/internal/core/model"	
 	go_core_aws_dynamo "github.com/eliezerraj/go-core/aws/dynamo"
-	go_core_aws_secret_manager "github.com/eliezerraj/go-core/aws/secret_manager" 
 )
 
 var childLogger = log.With().Str("core", "service").Logger()
 
 type WorkerService struct {
-	coreSecretManager 	*go_core_aws_secret_manager.AwsSecretManager
 	coreDynamoDB 		*go_core_aws_dynamo.DatabaseDynamo
 	awsService			*model.AwsService
 	Keys				*model.RsaKey
@@ -21,8 +19,7 @@ type WorkerService struct {
 }
 
 // About create a ner worker service
-func NewWorkerService(	coreSecretManager 	*go_core_aws_secret_manager.AwsSecretManager,
-						coreDynamoDB 		*go_core_aws_dynamo.DatabaseDynamo,
+func NewWorkerService(	coreDynamoDB 		*go_core_aws_dynamo.DatabaseDynamo,
 						awsService			*model.AwsService,
 						keys				*model.RsaKey,
 						tokenSignedValidation 	func(string, interface{}) (*model.JwtData, error),
@@ -30,7 +27,6 @@ func NewWorkerService(	coreSecretManager 	*go_core_aws_secret_manager.AwsSecretM
 	childLogger.Debug().Msg("NewWorkerService")
 
 	return &WorkerService{
-		coreSecretManager: coreSecretManager,
 		coreDynamoDB: coreDynamoDB,
 		awsService: awsService,
 		Keys: keys,

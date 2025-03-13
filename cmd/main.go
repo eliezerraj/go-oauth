@@ -116,15 +116,8 @@ func main (){
 		panic("error create new aws session " + err.Error())
 	}
 
-	coreDynamoDB, err := databaseDynamo.NewDatabaseDynamo(awsConfig)
-	if err != nil {
-		panic("error access dynamo aws service" + err.Error())
-	}
-
-	coreSecretManager, err := awsSecretManager.NewAwsSecretManager(awsConfig)
-	if err != nil {
-		panic("error access secret manager aws service" + err.Error())
-	}
+	coreDynamoDB := databaseDynamo.NewDatabaseDynamo(awsConfig)
+	coreSecretManager := awsSecretManager.NewAwsSecretManager(awsConfig)
 
 	appServer.RsaKey, err = loadKey(ctx, 
 									appServer.AwsService.SecretName, 
@@ -134,8 +127,7 @@ func main (){
 	}
 
 	// wire	
-	workerService, err := service.NewWorkerService(	coreSecretManager, 
-													coreDynamoDB, 
+	workerService, err := service.NewWorkerService(	coreDynamoDB, 
 													appServer.AwsService, 
 													appServer.RsaKey,
 													service.TokenValidationRSA,

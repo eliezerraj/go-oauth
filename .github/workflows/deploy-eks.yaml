@@ -23,7 +23,7 @@ defaults:
     
 jobs:
   setup-environment:
-    uses: ./.github/workflows/setup-environment.yml
+    uses: ./.github/workflows/setup-environment.yaml
     with:
       AWS_ACCOUNT_ID: ${{ github.event.inputs.AWS_ACCOUNT_ID }}
       REGION: ${{ github.event.inputs.REGION }}
@@ -70,36 +70,28 @@ jobs:
       id-token: write
       contents: read
     if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')
-      steps:
-        - name: Checkout repository
-          uses: actions/checkout@v4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-        - name: Configure aws credentials
-          uses: aws-actions/configure-aws-credentials@v4
-          with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-            aws-region: us-east-2
+      - name: Configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-2
 
-        - name: Execute Cloudformation
-          uses: aws-actions/aws-cloudformation-github-deploy@v1
-          env:
-            REPO_NAME: ${{ needs.setup-environment.outputs.REPO_NAME }}
-            ENVIRONMENT: ${{ needs.setup-environment.outputs.ENVIRONMENT }}
-            TEMPLATE_PATH: ${{ needs.setup-environment.outputs.CLOUDFORMATION_TEMPLATE_PATH }}
-            TEMPLATE_PARAMETERS_PATH: ${{ needs.setup-environment.outputs.CLOUDFORMATION_TEMPLATE_PARAMETERS_PATH }}
-          with:
-            name: ${{ env.REPO_NAME }}-stack
-            template: ${{ env.TEMPLATE_PATH }}
-            parameter-overrides: ${{ env.TEMPLATE_PARAMETERS_PATH }}
-            no-fail-on-empty-changeset: "1"
-            capabilities: CAPABILITY_AUTO_EXPAND,CAPABILITY_NAMED_IAM
-
-
-
-
-
-
-
-
+      - name: Execute Cloudformation
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        env:
+          REPO_NAME: ${{ needs.setup-environment.outputs.REPO_NAME }}
+          ENVIRONMENT: ${{ needs.setup-environment.outputs.ENVIRONMENT }}
+          TEMPLATE_PATH: ${{ needs.setup-environment.outputs.CLOUDFORMATION_TEMPLATE_PATH }}
+          TEMPLATE_PARAMETERS_PATH: ${{ needs.setup-environment.outputs.CLOUDFORMATION_TEMPLATE_PARAMETERS_PATH }}
+        with:
+          name: ${{ env.REPO_NAME }}-stack
+          template: ${{ env.TEMPLATE_PATH }}
+          parameter-overrides: ${{ env.TEMPLATE_PARAMETERS_PATH }}
+          no-fail-on-empty-changeset: "1"
+          capabilities: CAPABILITY_AUTO_EXPAND,CAPABILITY_NAMED_IAM

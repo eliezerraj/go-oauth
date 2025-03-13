@@ -42,8 +42,6 @@ Mappings:
       value: go-oauth
     owner:
       value: architecture
-    businessUnit:
-      value: architecture
     platform:
       value: global
     application:
@@ -126,12 +124,6 @@ Resources:
       - Key: stack
         Value:
           Fn::Sub: ${AWS::StackName}
-      - Key: business_unit
-        Value:
-          Fn::FindInMap:
-          - Tag
-          - businessUnit
-          - value
       - Key: platform
         Value:
           Fn::FindInMap:

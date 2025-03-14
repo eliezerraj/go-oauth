@@ -71,7 +71,7 @@ jobs:
       - id: image_tag
         run: echo "IMAGE_TAG=latest" >> "$GITHUB_OUTPUT"
       - id: kubernetes_manifest_path
-        run: echo "KUBERNETES_MANIFEST_PATH=/assets/kubernetes/aws" >> "$GITHUB_OUTPUT"
+        run: echo "KUBERNETES_MANIFEST_PATH=assets/kubernetes/aws" >> "$GITHUB_OUTPUT"
       - id: set_variables # Define env var
         run: |
           case "${{ github.ref }}" in

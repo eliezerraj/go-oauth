@@ -59,7 +59,7 @@ jobs:
       CLUSTER_NAME: ${{ steps.set_variables.outputs.CLUSTER_NAME }}
       CLUSTER_NAMESPACE: ${{ steps.set_variables.outputs.CLUSTER_NAMESPACE }}
       IMAGE_TAG: ${{ steps.image_tag.outputs.IMAGE_TAG }}
-      KUBERNETES_MANIFEST_PATH: ${{ github.workspace }}/${{ needs.setup-environment.outputs.KUBERNETES_MANIFEST_PATH }}
+      KUBERNETES_MANIFEST_PATH: ${{ steps.kubernetes_manifest_path.outputs.KUBERNETES_MANIFEST_PATH }}
 
     steps:
       - id: repo_name

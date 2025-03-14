@@ -169,7 +169,7 @@ jobs:
           CLUSTER_NAMESPACE: ${{ needs.setup-environment.outputs.CLUSTER_NAMESPACE }}
           ENVIRONMENT: ${{ needs.setup-environment.outputs.ENVIRONMENT }}
           IMAGE_TAG: ${{ needs.setup-environment.outputs.IMAGE_TAG }}
-          KUBERNETES_MANIFEST_PATH: ${{ github.workspace }}/${{ needs.setup-environment.outputs.KUBERNETES_MANIFEST_PATH }}
+          KUBERNETES_MANIFEST_PATH: ${{ needs.setup-environment.outputs.KUBERNETES_MANIFEST_PATH }}
         run: |
           # Instalar gettext se nao estiver disponivel
           if ! command -v envsubst &> /dev/null; then
@@ -189,8 +189,8 @@ jobs:
           
       - name: Deployment k8 manifests
         run: |
-          kubectl apply --kubeconfig /home/runner/.kube/config --validate=false --namespace=${{ needs.setup-environment.outputs.CLUSTER_NAMESPACE }} -f assets/kubernetes/aws/configmap.yaml
-          kubectl apply --kubeconfig /home/runner/.kube/config --validate=false --namespace=${{ needs.setup-environment.outputs.CLUSTER_NAMESPACE }} -f assets/kubernetes/aws/service-account.yaml
+          kubectl apply -f assets/kubernetes/aws/configmap.yaml
+          kubectl apply  -f assets/kubernetes/aws/service-account.yaml
           kubectl apply --kubeconfig /home/runner/.kube/config --validate=false --namespace=${{ needs.setup-environment.outputs.CLUSTER_NAMESPACE }} -f assets/kubernetes/aws/deployment.yaml
           kubectl apply --kubeconfig /home/runner/.kube/config --validate=false --namespace=${{ needs.setup-environment.outputs.CLUSTER_NAMESPACE }} -f assets/kubernetes/aws/service.yaml
           kubectl apply --kubeconfig /home/runner/.kube/config --validate=false --namespace=${{ needs.setup-environment.outputs.CLUSTER_NAMESPACE }} -f assets/kubernetes/aws/hpa.yaml

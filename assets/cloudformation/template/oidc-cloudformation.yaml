@@ -57,14 +57,6 @@ Resources:
             - Fn::Split:
               - //
               - Ref: providerURL
-      ManagedPolicyArns:
-        - !Sub "arn:aws:iam::${AWS::AccountId}:policy/key_activate_execution_control-policy"
-        - !Sub "arn:aws:iam::${AWS::AccountId}:policy/key_block_execution_control-policy"
-        - !Sub "arn:aws:iam::${AWS::AccountId}:policy/key_cancel_execution_control-policy"
-        - !Sub "arn:aws:iam::${AWS::AccountId}:policy/key_create_execution_control-policy"
-        - !Sub "arn:aws:iam::${AWS::AccountId}:policy/key_resolve_execution_control-policy"
-        - !Sub "arn:aws:iam::${AWS::AccountId}:policy/key_update_execution_control-policy"
-        - !Sub "arn:aws:iam::${AWS::AccountId}:policy/participant-policy"
       Policies:
       - PolicyName: OIDCRoleGoOauthPolicy
         PolicyDocument:

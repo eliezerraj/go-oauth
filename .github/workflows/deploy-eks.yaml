@@ -130,7 +130,7 @@ jobs:
           TEMPLATE_PATH: ${{ needs.setup-environment.outputs.CLOUDFORMATION_TEMPLATE_PATH }}
           TEMPLATE_PARAMETERS_PATH: ${{ needs.setup-environment.outputs.CLOUDFORMATION_TEMPLATE_PARAMETERS_PATH }}
         with:
-          name: ${{ env.REPO_NAME }}-stack
+          name: ${{ env.REPO_NAME }}-iaac-stack
           template: ${{ env.TEMPLATE_PATH }}
           parameter-overrides: ${{ env.TEMPLATE_PARAMETERS_PATH }}
           no-fail-on-empty-changeset: "1"

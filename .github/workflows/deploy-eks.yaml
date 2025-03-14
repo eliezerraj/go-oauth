@@ -167,7 +167,7 @@ jobs:
           role-to-assume: arn:aws:iam::${{ needs.setup-environment.outputs.AWS_ACCOUNT_ID }}:role/EKSAccessRole
           role-session-name: deploy_session
 
-      - name: Update Kubernetes manifest files
+      - name: Update kubernetes manifest files
         env:
           AWS_ACCOUNT_ID: ${{ needs.setup-environment.outputs.AWS_ACCOUNT_ID }}
           AWS_REGION: ${{ needs.setup-environment.outputs.AWS_REGION }}

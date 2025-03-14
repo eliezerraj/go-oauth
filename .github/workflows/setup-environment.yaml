@@ -38,6 +38,9 @@ on:
       CLUSTER_NAMESPACE:
         description: 'Cluster namespace'
         value: ${{ jobs.set-workflow-variables.outputs.CLUSTER_NAMESPACE }}
+      KUBERNETES_MANIFEST_PATH:
+        description: 'Kubernetes manifest path'
+        value: ${{ jobs.set-workflow-variables.outputs.KUBERNETES_MANIFEST_PATH }}
       IMAGE_TAG:
         description: 'Image tag'
         value: ${{ jobs.set-workflow-variables.outputs.IMAGE_TAG }}
@@ -56,6 +59,7 @@ jobs:
       CLUSTER_NAME: ${{ steps.set_variables.outputs.CLUSTER_NAME }}
       CLUSTER_NAMESPACE: ${{ steps.set_variables.outputs.CLUSTER_NAMESPACE }}
       IMAGE_TAG: ${{ steps.image_tag.outputs.IMAGE_TAG }}
+      KUBERNETES_MANIFEST_PATH: ${{ github.workspace }}/${{ needs.setup-environment.outputs.KUBERNETES_MANIFEST_PATH }}
 
     steps:
       - id: repo_name
@@ -66,6 +70,8 @@ jobs:
         run: echo "CLOUDFORMATION_TEMPLATE_PATH=assets/cloudformation/template/oidc-cloudformation.yaml" >> "$GITHUB_OUTPUT"
       - id: image_tag
         run: echo "IMAGE_TAG=latest" >> "$GITHUB_OUTPUT"
+      - id: kubernetes_manifest_path
+        run: echo "KUBERNETES_MANIFEST_PATH=/assets/kubernetes/aws" >> "$GITHUB_OUTPUT"
       - id: set_variables # Define env var
         run: |
           case "${{ github.ref }}" in

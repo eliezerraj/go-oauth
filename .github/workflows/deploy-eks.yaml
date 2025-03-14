@@ -134,4 +134,73 @@ jobs:
           template: ${{ env.TEMPLATE_PATH }}
           parameter-overrides: ${{ env.TEMPLATE_PARAMETERS_PATH }}
           no-fail-on-empty-changeset: "1"
-          capabilities: CAPABILITY_AUTO_EXPAND,CAPABILITY_NAMED_IAM
+          capabilities: CAPABILITY_AUTO_EXPAND,
+          
+  deploy-dev:
+    runs-on: arc-runner-set
+    needs: [ setup-environment, package-and-publish, infra-as-code ]
+    permissions:
+      id-token: write
+      contents: read
+    if: github.ref == 'refs/heads/main' 
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: 'latest'
+
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl unzip 
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install            
+          
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ needs.setup-environment.outputs.AWS_REGION }}
+          role-to-assume: arn:aws:iam::${{ needs.setup-environment.outputs.AWS_ACCOUNT_ID }}:role/EKSAccessRole
+          role-session-name: deploy_session
+
+      - name: Update kubernetes manifest files
+        env:
+          AWS_ACCOUNT_ID: ${{ needs.setup-environment.outputs.AWS_ACCOUNT_ID }}
+          AWS_REGION: ${{ needs.setup-environment.outputs.AWS_REGION }}
+          REGISTRY: ${{ needs.package-and-publish.outputs.REGISTRY }}
+          REPO_NAME: ${{ needs.setup-environment.outputs.REPO_NAME }}
+          CLUSTER_NAMESPACE: ${{ needs.setup-environment.outputs.CLUSTER_NAMESPACE }}
+          ENVIRONMENT: ${{ needs.setup-environment.outputs.ENVIRONMENT }}
+          IMAGE_TAG: ${{ needs.setup-environment.outputs.IMAGE_TAG }}
+          KUBERNETES_MANIFEST_PATH: ${{ github.workspace }}/${{ needs.setup-environment.outputs.KUBERNETES_MANIFEST_PATH }}
+        run: |
+          # Instalar gettext se nao estiver disponivel
+          if ! command -v envsubst &> /dev/null; then
+            sudo apt-get install -y gettext
+          fi
+
+          # Substituir variaveis em todos os arquivos YAML no diretorio de manifestos
+          for file in $KUBERNETES_MANIFEST_PATH/*.yaml; do
+            envsubst < "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
+          done
+
+          # Show all contect
+          cat $KUBERNETES_MANIFEST_PATH/*.yaml          
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name ${{ needs.setup-environment.outputs.CLUSTER_NAME }} --region ${{ needs.setup-environment.outputs.AWS_REGION }}
+          
+      - name: Deployment k8 manifests
+        run: |
+          kubectl apply --kubeconfig /home/runner/.kube/config --validate=false --namespace=${{ needs.setup-environment.outputs.CLUSTER_NAMESPACE }} -f assets/kubernetes/aws/configmap.yaml
+          kubectl apply --kubeconfig /home/runner/.kube/config --validate=false --namespace=${{ needs.setup-environment.outputs.CLUSTER_NAMESPACE }} -f assets/kubernetes/aws/service-account.yaml
+          kubectl apply --kubeconfig /home/runner/.kube/config --validate=false --namespace=${{ needs.setup-environment.outputs.CLUSTER_NAMESPACE }} -f assets/kubernetes/aws/deployment.yaml
+          kubectl apply --kubeconfig /home/runner/.kube/config --validate=false --namespace=${{ needs.setup-environment.outputs.CLUSTER_NAMESPACE }} -f assets/kubernetes/aws/service.yaml
+          kubectl apply --kubeconfig /home/runner/.kube/config --validate=false --namespace=${{ needs.setup-environment.outputs.CLUSTER_NAMESPACE }} -f assets/kubernetes/aws/hpa.yaml
+          kubectl apply --kubeconfig /home/runner/.kube/config --validate=false --namespace=${{ needs.setup-environment.outputs.CLUSTER_NAMESPACE }} -f assets/kubernetes/aws/ing.yaml
+          kubectl apply --kubeconfig /home/runner/.kube/config --validate=false --namespace=${{ needs.setup-environment.outputs.CLUSTER_NAMESPACE }} -f assets/kubernetes/aws/pod-disruption.yaml
+          kubectl rollout restart deployment/go-oauth --namespace=${{ needs.setup-environment.outputs.CLUSTER_NAMESPACE }}

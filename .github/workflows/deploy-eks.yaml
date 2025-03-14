@@ -171,18 +171,8 @@ jobs:
           IMAGE_TAG: ${{ needs.setup-environment.outputs.IMAGE_TAG }}
           KUBERNETES_MANIFEST_PATH: ${{ needs.setup-environment.outputs.KUBERNETES_MANIFEST_PATH }}
         run: |
-          # Instalar gettext se nao estiver disponivel
-          if ! command -v envsubst &> /dev/null; then
-            sudo apt-get install -y gettext
-          fi
-
-          # Substituir variaveis em todos os arquivos YAML no diretorio de manifestos
-          for file in $KUBERNETES_MANIFEST_PATH/*.yaml; do
-            envsubst < "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
-          done
-
-          # Show all contect
-          cat $KUBERNETES_MANIFEST_PATH/*.yaml          
+          # Show all contect.
+          cat $KUBERNETES_MANIFEST_PATH/configmap.yaml         
 
       - name: Update kubeconfig
         run: aws eks update-kubeconfig --name ${{ needs.setup-environment.outputs.CLUSTER_NAME }} --region ${{ needs.setup-environment.outputs.AWS_REGION }}

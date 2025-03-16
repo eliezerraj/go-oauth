@@ -106,7 +106,7 @@ func CreatedTokenRSA(keyRsaPriv interface{}, expirationTime time.Time, jwtData m
 	return &authentication ,nil
 }
 
-// About Login using symetric key
+// About Login
 func (w *WorkerService) OAUTHCredential(ctx context.Context, credential model.Credential) (*model.Authentication, error){
 	childLogger.Debug().Msg("OAUTHCredential")
 	childLogger.Debug().Interface("credential: ", credential).Msg("")

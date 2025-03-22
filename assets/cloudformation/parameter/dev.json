@@ -1,18 +1,10 @@
 [
-    {
-      "ParameterKey": "Env",
-      "ParameterValue": "dev"
-    },
-    {
-      "ParameterKey": "providerURL",
-      "ParameterValue": " https://oidc.eks.us-east-2.amazonaws.com/id/EFC4AFFB92FAA16E7D3568EA5FD390A6"
-    },
-    {
-      "ParameterKey": "ServiceAccountName",
-      "ParameterValue": "sa-go-oauth"
-    },
-    {
-      "ParameterKey": "K8Namespace",
-      "ParameterValue": "test-a"
-    }
+  {
+    "ParameterKey": "ApiVersion",
+    "ParameterValue": "3.0"
+  },
+  {
+    "ParameterKey": "Env",
+    "ParameterValue": "dev"
+  }
 ]

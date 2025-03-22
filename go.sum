@@ -28,10 +28,6 @@ github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.12.15 h1:dM9/92u2
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.12.15/go.mod h1:SwFBy2vjtA0vZbjjaFtfN045boopadnoVPhu4Fv66vY=
 github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.35.2 h1:vlYXbindmagyVA3RS2SPd47eKZ00GZZQcr+etTviHtc=
 github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.35.2/go.mod h1:yGhDiLKguA3iFJYxbrQkQiNzuy+ddxesSZYWVeeEH5Q=
-github.com/aws/aws-sdk-go-v2/service/sns v1.34.1 h1:dorU2TjYGV8plbMxNNMMKC3IhMG6FdrMkVTdW92iXWM=
-github.com/aws/aws-sdk-go-v2/service/sns v1.34.1/go.mod h1:PJtxxMdj747j8DeZENRTTYAz/lx/pADn/U0k7YNNiUY=
-github.com/aws/aws-sdk-go-v2/service/sqs v1.38.1 h1:ZtgZeMPJH8+/vNs9vJFFLI0QEzYbcN0p7x1/FFwyROc=
-github.com/aws/aws-sdk-go-v2/service/sqs v1.38.1/go.mod h1:Bar4MrRxeqdn6XIh8JGfiXuFRmyrrsZNTJotxEJmWW0=
 github.com/aws/aws-sdk-go-v2/service/sso v1.25.1 h1:8JdC7Gr9NROg1Rusk25IcZeTO59zLxsKgE0gkh5O6h0=
 github.com/aws/aws-sdk-go-v2/service/sso v1.25.1/go.mod h1:qs4a9T5EMLl/Cajiw2TcbNt2UNo/Hqlyp+GiuG4CFDI=
 github.com/aws/aws-sdk-go-v2/service/ssooidc v1.29.1 h1:KwuLovgQPcdjNMfFt9OhUd9a2OwcOKhxfvF4glTzLuA=
@@ -45,8 +41,8 @@ github.com/cenkalti/backoff/v4 v4.3.0/go.mod h1:Y3VNntkOUPxTVeUxJ/G5vcM//AlwfmyY
 github.com/coreos/go-systemd/v22 v22.5.0/go.mod h1:Y58oyj3AT4RCenI/lSvhwexgC+NSVTIJ3seZv2GcEnc=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/eliezerraj/go-core v1.0.37 h1:0Qz7EhVtkjREc9cg+ppfuSv30tDIUN9AfuEZ5McSMkc=
-github.com/eliezerraj/go-core v1.0.37/go.mod h1:I6LN0Y0iaICk+s3AQVY5yYISL2zTlNBysbXj9XTx5J8=
+github.com/eliezerraj/go-core v1.0.54 h1:egn31shLCEYxMGvLmWkNVp51GYpr09eBlmTpFoc0grs=
+github.com/eliezerraj/go-core v1.0.54/go.mod h1:gofQOkLQBlD7Sqs5t0xv2dBSbOjZHyEqa0Az90aR7Fw=
 github.com/felixge/httpsnoop v1.0.4 h1:NFTV2Zj1bL4mc9sqWACXbQFVBBg2W3GPvqp8/ESS2Wg=
 github.com/felixge/httpsnoop v1.0.4/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=
 github.com/go-logr/logr v1.2.2/go.mod h1:jdQByPbusPIv2/zmleS9BjJVeZ6kBagPoEUsqbVz/1A=
@@ -85,8 +81,6 @@ github.com/stretchr/testify v1.10.0 h1:Xv5erBjTwe/5IxqUQTdXv5kgmIvbHo3QQyRwhJsOf
 github.com/stretchr/testify v1.10.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
 go.opentelemetry.io/auto/sdk v1.1.0 h1:cH53jehLUN6UFLY71z+NDOiNJqDdPRaXzTel0sJySYA=
 go.opentelemetry.io/auto/sdk v1.1.0/go.mod h1:3wSPjt5PWp2RhlCcmmOial7AvC4DQqZb7a7wCow3W8A=
-go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-sdk-go-v2/otelaws v0.60.0 h1:QYOihN1vm5VfwcOIJnjW0NyYvH0dc+2TweGdhcLafww=
-go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-sdk-go-v2/otelaws v0.60.0/go.mod h1:2BuYX+IdOOB7buxg7p2OJArUPbLp564rIYMGdFJytPk=
 go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.60.0 h1:iLuogsToNW6QaOYPcbIwhkdRTkc0gvXzuiajObXc6WY=
 go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.60.0/go.mod h1:XNSNQBtSOifFUw0aQUyBN0Ff+0NddEnbSATy2QlFgm8=
 go.opentelemetry.io/contrib/propagators/aws v1.35.0 h1:xoXA+5dVwsf5uE5GvSJ3lKiapyMFuIzbEmJwQ0JP+QU=
@@ -124,7 +118,7 @@ google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f h1:
 google.golang.org/genproto/googleapis/rpc v0.0.0-20250115164207-1a7da9e5054f/go.mod h1:+2Yz8+CLJbIfL9z73EW45avw8Lmge3xVElCP9zEKi50=
 google.golang.org/grpc v1.69.4 h1:MF5TftSMkd8GLw/m0KM6V8CMOCY6NZ1NQDPGFgbTt4A=
 google.golang.org/grpc v1.69.4/go.mod h1:vyjdE6jLBI76dgpDojsFGNaHlxdjXN9ghpnd2o7JGZ4=
-google.golang.org/protobuf v1.36.3 h1:82DV7MYdb8anAVi3qge1wSnMDrnKK7ebr+I0hHRN1BU=
-google.golang.org/protobuf v1.36.3/go.mod h1:9fA7Ob0pmnwhb644+1+CVWFRbNajQ6iRojtC/QF5bRE=
+google.golang.org/protobuf v1.36.5 h1:tPhr+woSbjfYvY6/GPufUoYizxw1cF/yFoxJ2fmpwlM=
+google.golang.org/protobuf v1.36.5/go.mod h1:9fA7Ob0pmnwhb644+1+CVWFRbNajQ6iRojtC/QF5bRE=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=

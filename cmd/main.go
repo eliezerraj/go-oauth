@@ -22,16 +22,18 @@ import(
 )
 
 var(
-	logLevel = 	zerolog.DebugLevel
+	logLevel = 	zerolog.InfoLevel // zerolog.InfoLevel zerolog.DebugLevel
 	appServer	model.AppServer
 	awsConfig 	go_core_aws_config.AwsConfig
 	databaseDynamo		go_core_aws_dynamo.DatabaseDynamo
 	awsSecretManager	go_core_aws_secret_manager.AwsSecretManager
+	childLogger = log.With().Str("component","go-oauth").Str("package", "main").Logger()
 )
 
 // About initialize the enviroment var
 func init(){
-	log.Debug().Msg("init")
+	childLogger.Info().Str("func","init").Send()
+
 	zerolog.SetGlobalLevel(logLevel)
 
 	infoPod, server := configuration.GetInfoPod()
@@ -46,7 +48,7 @@ func init(){
 
 // About loads all key (HS256 and RSA)
 func loadKey(ctx context.Context, secretName string, coreSecretManager *go_core_aws_secret_manager.AwsSecretManager) (*model.RsaKey, error){
-	log.Debug().Msg("loadKey")
+	childLogger.Info().Str("func","loadKey").Send()
 
 	// Load symetric key from secret manager
 	var certCore go_core_cert.CertCore
@@ -101,10 +103,7 @@ func loadKey(ctx context.Context, secretName string, coreSecretManager *go_core_
 
 // About main
 func main (){
-	log.Debug().Msg("main")
-	log.Debug().Msg("----------------------------------------------------")
-	log.Debug().Interface("appServer :",appServer).Msg("")
-	log.Debug().Msg("----------------------------------------------------")
+	childLogger.Info().Str("func","main").Interface("appServer :",appServer).Send()
 
 	ctx, cancel := context.WithTimeout(	context.Background(), 
 										time.Duration( appServer.Server.ReadTimeout ) * time.Second)

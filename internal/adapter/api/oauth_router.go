@@ -14,7 +14,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var childLogger = log.With().Str("adapter", "api.router").Logger()
+var childLogger = log.With().Str("component", "go-outhh").Str("package", "internal.adapter.api").Logger()
 
 var core_json coreJson.CoreJson
 var core_apiError coreJson.APIError
@@ -27,6 +27,8 @@ type HttpRouters struct {
 
 // Above setup the type model of jwt key signature
 func (h *HttpRouters) setSignModel(model string, credential *model.Credential){
+	childLogger.Info().Str("func","setSignModel").Send()
+
 	if model == "HS256" {
 		credential.JwtKeySign = h.workerService.Keys.JwtKey
 		credential.JwtKeyCreation = h.workerService.Keys.JwtKey
@@ -41,6 +43,8 @@ func (h *HttpRouters) setSignModel(model string, credential *model.Credential){
 }
 
 func NewHttpRouters(workerService *service.WorkerService) HttpRouters {
+	childLogger.Info().Str("func","NewHttpRouters").Send()
+
 	return HttpRouters{
 		workerService: workerService,
 	}
@@ -48,7 +52,7 @@ func NewHttpRouters(workerService *service.WorkerService) HttpRouters {
 
 // About return a health
 func (h *HttpRouters) Health(rw http.ResponseWriter, req *http.Request) {
-	childLogger.Debug().Msg("Health")
+	childLogger.Info().Str("func","Health").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
 	health := true
 	json.NewEncoder(rw).Encode(health)
@@ -64,15 +68,14 @@ func (h *HttpRouters) Live(rw http.ResponseWriter, req *http.Request) {
 
 // About show all header received
 func (h *HttpRouters) Header(rw http.ResponseWriter, req *http.Request) {
-	childLogger.Debug().Msg("Header")
-	
+	childLogger.Info().Str("func","Header").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
+
 	json.NewEncoder(rw).Encode(req.Header)
 }
 
 // About login using symetric method  
 func (h *HttpRouters) OAUTHCredential(rw http.ResponseWriter, req *http.Request) error {
-	childLogger.Debug().Msg("OAUTHCredential")
-	childLogger.Debug().Interface("req: ", req.RequestURI).Msg("")
+	childLogger.Info().Str("func","OAUTHCredential").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
 	//trace
 	span := tracerProvider.Span(req.Context(), "adapter.api.OAUTHCredential")
@@ -111,8 +114,7 @@ func (h *HttpRouters) OAUTHCredential(rw http.ResponseWriter, req *http.Request)
 
 // About check a token expitation date
 func (h *HttpRouters) TokenValidation(rw http.ResponseWriter, req *http.Request) error {
-	childLogger.Debug().Msg("TokenValidation")
-	childLogger.Debug().Interface("req: ", req.RequestURI).Msg("")
+	childLogger.Info().Str("func","TokenValidation").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
 	//trace
 	span := tracerProvider.Span(req.Context(), "adapter.api.TokenValidation")
@@ -151,8 +153,7 @@ func (h *HttpRouters) TokenValidation(rw http.ResponseWriter, req *http.Request)
 
 // About refresh token
 func (h *HttpRouters) RefreshToken(rw http.ResponseWriter, req *http.Request) error {
-	childLogger.Debug().Msg("RefreshToken")
-	childLogger.Debug().Interface("req: ", req.RequestURI).Msg("")
+	childLogger.Info().Str("func","RefreshToken").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
 	//trace
 	span := tracerProvider.Span(req.Context(), "adapter.api.RefreshToken")
@@ -191,7 +192,7 @@ func (h *HttpRouters) RefreshToken(rw http.ResponseWriter, req *http.Request) er
 
 // About wellknow service
 func (h *HttpRouters) WellKnown(rw http.ResponseWriter, req *http.Request) error {
-	childLogger.Debug().Msg("WellKnown")
+	childLogger.Info().Str("func","WellKnown").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
 	//trace
 	span := tracerProvider.Span(req.Context(), "adapter.api.WellKnown")
@@ -214,7 +215,7 @@ func (h *HttpRouters) WellKnown(rw http.ResponseWriter, req *http.Request) error
 
 // About validate token was signed with a pubkey
 func (h *HttpRouters) ValidationTokenSignedPubKey(rw http.ResponseWriter, req *http.Request) error {
-	childLogger.Debug().Msg("ValidationTokenSignedPubKey")
+	childLogger.Info().Str("func","ValidationTokenSignedPubKey").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
 	//trace
 	span := tracerProvider.Span(req.Context(), "adapter.api.ValidationTokenSignedPubKey")
@@ -245,7 +246,7 @@ func (h *HttpRouters) ValidationTokenSignedPubKey(rw http.ResponseWriter, req *h
 
 // About checj a crl list
 func (h *HttpRouters) VerifyCertCRL(rw http.ResponseWriter, req *http.Request) error {
-	childLogger.Debug().Msg("VerifyCertCRL")
+	childLogger.Info().Str("func","VerifyCertCRL").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
 	//trace
 	span := tracerProvider.Span(req.Context(), "adapter.api.VerifyCertCRL")

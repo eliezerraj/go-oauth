@@ -11,7 +11,7 @@ import (
 
 // About create a new credential
 func (h *HttpRouters) SignIn(rw http.ResponseWriter, req *http.Request) error {
-	childLogger.Debug().Msg("SignIn")
+	childLogger.Info().Str("func","SignIn").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
 	//trace
 	span := tracerProvider.Span(req.Context(), "adapter.api.SignIn")
@@ -43,7 +43,7 @@ func (h *HttpRouters) SignIn(rw http.ResponseWriter, req *http.Request) error {
 
 // About add a scope
 func (h *HttpRouters) AddScope(rw http.ResponseWriter, req *http.Request) error {
-	childLogger.Debug().Msg("AddScope")
+	childLogger.Info().Str("func","AddScope").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
 	//trace
 	span := tracerProvider.Span(req.Context(), "adapter.api.AddScope")
@@ -75,7 +75,7 @@ func (h *HttpRouters) AddScope(rw http.ResponseWriter, req *http.Request) error 
 
 // About add a scope
 func (h *HttpRouters) GetCredential(rw http.ResponseWriter, req *http.Request) error {
-	childLogger.Debug().Msg("AddScope")
+	childLogger.Info().Str("func","GetCredential").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
 	//trace
 	span := tracerProvider.Span(req.Context(), "adapter.api.GetCredential")

@@ -17,8 +17,8 @@ FROM alpine
 WORKDIR /app
 COPY --from=builder /app/cmd/go-oauth .
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /app/assets/certs/server-private.key /assets/certs/vault/
-COPY --from=builder /app/assets/certs/server-public.key /assets/certs/vault/
-COPY --from=builder /app/assets/certs/crl-ca.crl /assets/certs/vault/
+COPY --from=builder /app/assets/certs/server-private.key ./assets/certs/vault/
+COPY --from=builder /app/assets/certs/server-public.key ./assets/certs/vault/
+COPY --from=builder /app/assets/certs/crl-ca.crl ./assets/certs/vault/
 
 CMD ["/app/go-oauth"]

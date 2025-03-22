@@ -67,7 +67,7 @@ jobs:
       - id: main_go_file
         run: echo "MAIN_GO_FILE=cmd/main.go" >> "$GITHUB_OUTPUT"
       - id: cloudformation_template_path
-        run: echo "CLOUDFORMATION_TEMPLATE_PATH=assets/cloudformation/template/oidc-cloudformation.yaml" >> "$GITHUB_OUTPUT"
+        run: echo "CLOUDFORMATION_TEMPLATE_PATH=assets/cloudformation/template/stack-cloudformation.yaml" >> "$GITHUB_OUTPUT"
       - id: image_tag
         run: echo "IMAGE_TAG=latest" >> "$GITHUB_OUTPUT"
       - id: kubernetes_manifest_path

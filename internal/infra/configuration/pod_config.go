@@ -39,10 +39,10 @@ func GetInfoPod() (	model.InfoPod, model.Server) {
 	if os.Getenv("POD_NAME") !=  "" {
 		infoPod.PodName = os.Getenv("POD_NAME")
 	}
-	if os.Getenv("SETPOD_AZ") == "false" {	
-		infoPod.IsAZ = false
-	} else {
+	if os.Getenv("SETPOD_AZ") == "true" {	
 		infoPod.IsAZ = true
+	} else {
+		infoPod.IsAZ = false
 	}
 	if os.Getenv("ENV") !=  "" {	
 		infoPod.Env = os.Getenv("ENV")
@@ -51,7 +51,7 @@ func GetInfoPod() (	model.InfoPod, model.Server) {
 	// Get IP
 	addrs, err := net.InterfaceAddrs()
 	if err != nil {
-		log.Error().Err(err).Msg("error to get the POD IP address")
+		log.Error().Err(err).Send()
 		os.Exit(3)
 	}
 	for _, a := range addrs {
@@ -68,13 +68,11 @@ func GetInfoPod() (	model.InfoPod, model.Server) {
 		cfg, err := config.LoadDefaultConfig(context.TODO())
 		if err != nil {
 			childLogger.Info().Err(err).Send()
-			os.Exit(3)
 		}
 		client := imds.NewFromConfig(cfg)
 		response, err := client.GetInstanceIdentityDocument(context.TODO(), &imds.GetInstanceIdentityDocumentInput{})
 		if err != nil {
 			childLogger.Info().Err(err).Send()
-			os.Exit(3)
 		}
 		infoPod.AvailabilityZone = response.AvailabilityZone	
 	} else {

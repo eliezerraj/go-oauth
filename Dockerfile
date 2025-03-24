@@ -1,5 +1,6 @@
 #docker build -t go-oauth .
-#docker run -dit --name go-oauth -p 5100:5100 go-oauth
+#docker run -dit --name go-oauth -p 5100:5100 go-oauth sleep infinity
+
 
 FROM golang:1.23.3 As builder
 
@@ -17,8 +18,8 @@ FROM alpine
 WORKDIR /app
 COPY --from=builder /app/cmd/go-oauth .
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /app/assets/certs/server-private.key ./assets/certs/vault/
-COPY --from=builder /app/assets/certs/server-public.key ./assets/certs/vault/
-COPY --from=builder /app/assets/certs/crl-ca.crl ./assets/certs/vault/
+COPY --from=builder /app/assets/certs/server-private.key ../assets/certs/
+COPY --from=builder /app/assets/certs/server-public.key ../assets/certs/
+COPY --from=builder /app/assets/certs/crl-ca.crl ../assets/certs/
 
 CMD ["/app/go-oauth"]

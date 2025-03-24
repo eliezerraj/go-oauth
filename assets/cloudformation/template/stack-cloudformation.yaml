@@ -152,7 +152,7 @@ Resources:
       #- Key: cost_center_code
       #  Value: !Sub "{{resolve:ssm:/arch_tag/cost_center_code}}"
       #- Key: cost_center_name
-      #  Value: !Sub "{{resolve:ssm:/arc_tag/cost_center_name}}"
+      #  Value: !Sub "{{resolve:ssm:/arch_tag/cost_center_name}}"
       - Key: name
         Value: !Sub "oidc iam role"
 

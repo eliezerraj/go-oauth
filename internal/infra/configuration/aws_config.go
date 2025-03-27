@@ -13,7 +13,7 @@ func GetAwsServiceEnv() model.AwsService {
 
 	err := godotenv.Load(".env")
 	if err != nil {
-		childLogger.Info().Err(err).Msg("env file not found !!!")
+		childLogger.Info().Err(err).Send()
 	}
 	
 	var awsService	model.AwsService

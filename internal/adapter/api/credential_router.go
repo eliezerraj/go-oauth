@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"encoding/json"
 	"net/http"
 
@@ -17,11 +18,13 @@ func (h *HttpRouters) SignIn(rw http.ResponseWriter, req *http.Request) error {
 	span := tracerProvider.Span(req.Context(), "adapter.api.SignIn")
 	defer span.End()
 
+	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
+
 	// prepare body
 	credential := model.Credential{}
 	err := json.NewDecoder(req.Body).Decode(&credential)
     if err != nil {
-		core_apiError = core_apiError.NewAPIError(err, http.StatusBadRequest)
+		core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusBadRequest)
 		return &core_apiError
     }
 	defer req.Body.Close()
@@ -31,9 +34,9 @@ func (h *HttpRouters) SignIn(rw http.ResponseWriter, req *http.Request) error {
 	if err != nil {
 		switch err {
 		case erro.ErrNotFound:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusNotFound)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusNotFound)
 		default:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusInternalServerError)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusInternalServerError)
 		}
 		return &core_apiError
 	}
@@ -49,11 +52,13 @@ func (h *HttpRouters) AddScope(rw http.ResponseWriter, req *http.Request) error 
 	span := tracerProvider.Span(req.Context(), "adapter.api.AddScope")
 	defer span.End()
 
+	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
+
 	// prepare body
 	credential_scope := model.CredentialScope{}
 	err := json.NewDecoder(req.Body).Decode(&credential_scope)
     if err != nil {
-		core_apiError = core_apiError.NewAPIError(err, http.StatusBadRequest)
+		core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusBadRequest)
 		return &core_apiError
     }
 	defer req.Body.Close()
@@ -63,9 +68,9 @@ func (h *HttpRouters) AddScope(rw http.ResponseWriter, req *http.Request) error 
 	if err != nil {
 		switch err {
 		case erro.ErrNotFound:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusNotFound)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusNotFound)
 		default:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusInternalServerError)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusInternalServerError)
 		}
 		return &core_apiError
 	}
@@ -80,6 +85,7 @@ func (h *HttpRouters) GetCredential(rw http.ResponseWriter, req *http.Request) e
 	//trace
 	span := tracerProvider.Span(req.Context(), "adapter.api.GetCredential")
 	defer span.End()
+	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
 
 	//parameters
 	vars := mux.Vars(req)
@@ -92,9 +98,9 @@ func (h *HttpRouters) GetCredential(rw http.ResponseWriter, req *http.Request) e
 	if err != nil {
 		switch err {
 		case erro.ErrNotFound:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusNotFound)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusNotFound)
 		default:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusInternalServerError)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusInternalServerError)
 		}
 		return &core_apiError
 	}

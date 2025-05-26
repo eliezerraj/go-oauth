@@ -57,14 +57,18 @@ childLogger.Info().Str("func","StartHttpAppServer").Send()
 											appServer.ConfigOTEL, 
 											&infoTrace)
 
-	otel.SetTextMapPropagator(xray.Propagator{})
-	otel.SetTracerProvider(tp)
+	if tp != nil {
+		otel.SetTextMapPropagator(xray.Propagator{})
+		otel.SetTracerProvider(tp)
+	}
 
 	// handle defer
 	defer func() { 
-		err := tp.Shutdown(ctx)
-		if err != nil{
-			childLogger.Info().Err(err).Send()
+		if tp != nil {
+			err := tp.Shutdown(ctx)
+			if err != nil{
+				childLogger.Error().Err(err).Send()
+			}
 		}
 		childLogger.Info().Msg("stop done !!!")
 	}()

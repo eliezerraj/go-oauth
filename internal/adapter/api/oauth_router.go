@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"encoding/json"
 	"net/http"
 	"strings"
@@ -54,16 +55,14 @@ func NewHttpRouters(workerService *service.WorkerService) HttpRouters {
 func (h *HttpRouters) Health(rw http.ResponseWriter, req *http.Request) {
 	childLogger.Info().Str("func","Health").Interface("trace-resquest-id", req.Context().Value("trace-request-id")).Send()
 
-	health := true
-	json.NewEncoder(rw).Encode(health)
+	json.NewEncoder(rw).Encode(model.MessageRouter{Message: "true"})
 }
 
 // About return a live
 func (h *HttpRouters) Live(rw http.ResponseWriter, req *http.Request) {
 	childLogger.Debug().Msg("Live")
 
-	live := true
-	json.NewEncoder(rw).Encode(live)
+	json.NewEncoder(rw).Encode(model.MessageRouter{Message: "true"})
 }
 
 // About show all header received
@@ -81,11 +80,13 @@ func (h *HttpRouters) OAUTHCredential(rw http.ResponseWriter, req *http.Request)
 	span := tracerProvider.Span(req.Context(), "adapter.api.OAUTHCredential")
 	defer span.End()
 
+	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
+
 	// prepare body
 	credential := model.Credential{}
 	err := json.NewDecoder(req.Body).Decode(&credential)
     if err != nil {
-		core_apiError = core_apiError.NewAPIError(err, http.StatusBadRequest)
+		core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusBadRequest)
 		return &core_apiError
     }
 	defer req.Body.Close()
@@ -102,9 +103,9 @@ func (h *HttpRouters) OAUTHCredential(rw http.ResponseWriter, req *http.Request)
 	if err != nil {
 		switch err {
 		case erro.ErrNotFound:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusNotFound)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusNotFound)
 		default:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusInternalServerError)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusInternalServerError)
 		}
 		return &core_apiError
 	}
@@ -119,6 +120,7 @@ func (h *HttpRouters) TokenValidation(rw http.ResponseWriter, req *http.Request)
 	//trace
 	span := tracerProvider.Span(req.Context(), "adapter.api.TokenValidation")
 	defer span.End()
+	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
 
 	//parameters
 	vars := mux.Vars(req)
@@ -139,11 +141,11 @@ func (h *HttpRouters) TokenValidation(rw http.ResponseWriter, req *http.Request)
 	if err != nil {
 		switch err {
 		case erro.ErrTokenExpired:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusUnauthorized)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusUnauthorized)
 		case erro.ErrStatusUnauthorized:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusUnauthorized)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusUnauthorized)
 		default:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusInternalServerError)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusInternalServerError)
 		}
 		return &core_apiError
 	}
@@ -159,11 +161,13 @@ func (h *HttpRouters) RefreshToken(rw http.ResponseWriter, req *http.Request) er
 	span := tracerProvider.Span(req.Context(), "adapter.api.RefreshToken")
 	defer span.End()
 
+	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
+
 	// prepare body
 	credential := model.Credential{}
 	err := json.NewDecoder(req.Body).Decode(&credential)
     if err != nil {
-		core_apiError = core_apiError.NewAPIError(err, http.StatusBadRequest)
+		core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusBadRequest)
 		return &core_apiError
     }
 	defer req.Body.Close()
@@ -180,9 +184,9 @@ func (h *HttpRouters) RefreshToken(rw http.ResponseWriter, req *http.Request) er
 	if err != nil {
 		switch err {
 		case erro.ErrNotFound:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusNotFound)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusNotFound)
 		default:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusInternalServerError)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusInternalServerError)
 		}
 		return &core_apiError
 	}
@@ -198,14 +202,16 @@ func (h *HttpRouters) WellKnown(rw http.ResponseWriter, req *http.Request) error
 	span := tracerProvider.Span(req.Context(), "adapter.api.WellKnown")
 	defer span.End()
 
+	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
+
 	//call service
 	res, err := h.workerService.WellKnown(req.Context())
 	if err != nil {
 		switch err {
 		case erro.ErrNotFound:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusNotFound)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusNotFound)
 		default:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusInternalServerError)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusInternalServerError)
 		}
 		return &core_apiError
 	}
@@ -221,10 +227,12 @@ func (h *HttpRouters) ValidationTokenSignedPubKey(rw http.ResponseWriter, req *h
 	span := tracerProvider.Span(req.Context(), "adapter.api.ValidationTokenSignedPubKey")
 	defer span.End()
 
+	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
+
 	jwksData := model.JwksData{}
 	err := json.NewDecoder(req.Body).Decode(&jwksData)
     if err != nil {
-		core_apiError = core_apiError.NewAPIError(err, http.StatusBadRequest)
+		core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusBadRequest)
 		return &core_apiError
     }
 	defer req.Body.Close()
@@ -234,9 +242,9 @@ func (h *HttpRouters) ValidationTokenSignedPubKey(rw http.ResponseWriter, req *h
 	if err != nil {
 		switch err {
 		case erro.ErrNotFound:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusNotFound)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusNotFound)
 		default:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusInternalServerError)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusInternalServerError)
 		}
 		return &core_apiError
 	}
@@ -252,10 +260,12 @@ func (h *HttpRouters) VerifyCertCRL(rw http.ResponseWriter, req *http.Request) e
 	span := tracerProvider.Span(req.Context(), "adapter.api.VerifyCertCRL")
 	defer span.End()
 
+	trace_id := fmt.Sprintf("%v",req.Context().Value("trace-request-id"))
+
 	caCert := model.RsaKey{}
 	err := json.NewDecoder(req.Body).Decode(&caCert)
     if err != nil {
-		core_apiError = core_apiError.NewAPIError(err, http.StatusBadRequest)
+		core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusBadRequest)
 		return &core_apiError
     }
 	defer req.Body.Close()
@@ -265,9 +275,9 @@ func (h *HttpRouters) VerifyCertCRL(rw http.ResponseWriter, req *http.Request) e
 	if err != nil {
 		switch err {
 		case erro.ErrNotFound:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusNotFound)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusNotFound)
 		default:
-			core_apiError = core_apiError.NewAPIError(err, http.StatusInternalServerError)
+			core_apiError = core_apiError.NewAPIError(err, trace_id, http.StatusInternalServerError)
 		}
 		return &core_apiError
 	}

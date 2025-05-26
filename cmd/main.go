@@ -19,6 +19,8 @@ import(
 	go_core_aws_config "github.com/eliezerraj/go-core/aws/aws_config"
 	go_core_aws_dynamo "github.com/eliezerraj/go-core/aws/dynamo"
 	go_core_aws_secret_manager "github.com/eliezerraj/go-core/aws/secret_manager" 
+
+	"go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-sdk-go-v2/otelaws"
 )
 
 var(
@@ -103,7 +105,7 @@ func loadKey(ctx context.Context, secretName string, coreSecretManager *go_core_
 
 // About main
 func main (){
-	childLogger.Info().Str("func","main").Interface("appServer :",appServer).Send()
+	childLogger.Info().Str("func","main").Interface("appServer",appServer).Send()
 
 	ctx, cancel := context.WithTimeout(	context.Background(), 
 										time.Duration( appServer.Server.ReadTimeout ) * time.Second)
@@ -114,6 +116,9 @@ func main (){
 	if err != nil {
 		panic("error create new aws session " + err.Error())
 	}
+
+	// Otel over aws services
+	otelaws.AppendMiddlewares(&awsConfig.APIOptions)
 
 	coreDynamoDB := databaseDynamo.NewDatabaseDynamo(awsConfig)
 	coreSecretManager := awsSecretManager.NewAwsSecretManager(awsConfig)

@@ -11,9 +11,11 @@ data:
   PORT: "5100"
   SETPOD_AZ: "false"
   ENV: "dev"
-  OTEL_EXPORTER_OTLP_ENDPOINT: "arch-eks-02-xray-collector.default.svc.cluster.local:4317"
 
   DYNAMO_TABLE_NAME: "user_login_2"
   SECRET_NAME: "key-jwt-auth"
-  
- 
+
+  OTEL_EXPORTER_OTLP_ENDPOINT: "arch-eks-02-xray-collector.default.svc.cluster.local:4317"
+  USE_STDOUT_TRACER_EXPORTER: "false"
+  USE_OTLP_COLLECTOR: "true" 
+  AWS_CLOUDWATCH_LOG_GROUP_NAMES: "/dock/eks/eks-arch-02"
